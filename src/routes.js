@@ -4,9 +4,11 @@ const router = express.Router();
 const FacultySchema = require('./models/faculty');
 const DepartmentSchema = require('./models/department');
 const MajorSchema = require('./models/major');
+const CourseSchema = require('./models/course');
 const FacultyController = require('./controllers/facultyController');
 const DepartmentController = require('./controllers/DepartmentController');
 const MajorController = require('./controllers/MajorController');
+const CourseController = require('./controllers/CourseController');
 const parse5 = require('parse5');
 const async = require('async');
 
@@ -146,7 +148,7 @@ router.post('/major', (req, res) => {
                 })
 
             })
-        )
+        );
         Promise.all(processList3).then(() => {
             Promise.all(processList).then(() => {
                 Promise.all(processList2).then(() => {
@@ -155,7 +157,38 @@ router.post('/major', (req, res) => {
             })
         })
     });
-})
+});
+
+router.post('/course', (req, res) => {
+    let courseController = new CourseController();
+
+    courseController.httpGetAsync('http://www.calendar.ubc.ca/vancouver/index.cfm?tree=12,215,410,417', function (data) {
+        let document = parse5.parse(data);
+        let hreflist = [];
+        courseController.searchRecursively(document, "href", hreflist);
+        console.log(hreflist);
+        res.send(hreflist);
+        // let processList = [];
+        //
+        // for (let i = 0; i < hreflist.length; i++) {
+        //     let courseSchema = new CourseSchema();
+        //
+        //     courseSchema.name = hreflist[i].name;
+        //     courseSchema.code = hreflist[i].code;
+        //
+        //     processList.push(
+        //         courseSchema.save().then((data) => {
+        //             console.log("successfully saved course with data name: " + data.name);
+        //         })
+        //     );
+        // }
+        //
+        // Promise.all(processList).then(() => {
+        //     res.send('success');
+        // });
+
+    });
+});
 
 const StaticModel = require('./models/StaticModel');
 let staticModel = new StaticModel();

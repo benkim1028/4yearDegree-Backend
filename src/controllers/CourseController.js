@@ -27,16 +27,15 @@ class CourseController {
     }
 
     searchRecursively(node, name, list){
-        let newRegex = new RegExp("^index.cfm\\?tree=[0-9]\\S*");
-        let newRegex2 = new RegExp("[a-z]+(\\s|[a-z])*")
-        let counter
+        // let newRegex = new RegExp("^index.cfm\\?tree=[0-9]\\S*");
+        // let newRegex2 = new RegExp("[a-z]+(\\s|[a-z])*");
         if (typeof node.attrs !== "undefined") {
             for (let attribute of node.attrs) {
-
-                if(attribute.name == "cellpadding" && attribute.value == 1){
+                console.log(attribute);
+                if(attribute.name == "cellpadding" && attribute.value == 3){
                     this.counter = true;
                 }
-                if (attribute.name == name && newRegex.test(attribute.value) && newRegex2.test(node.childNodes[0].value)) {
+                if (attribute.name == name) {
                     let name = node.childNodes[0].value;
                     let link = "http://www.calendar.ubc.ca/vancouver/" + attribute.value;
                     let newobject = {};

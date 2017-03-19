@@ -27,7 +27,6 @@ class FacultyController {
     searchRecursively(node, name, list){
         let newRegex = new RegExp("^index.cfm\\?tree=[0-9]\\S*");
         let newRegex2 = new RegExp("[a-z]+(\\s|[a-z])*")
-        let counter
         if (typeof node.attrs !== "undefined") {
             for (let attribute of node.attrs) {
 
