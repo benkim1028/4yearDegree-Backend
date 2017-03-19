@@ -20,11 +20,14 @@ app.use(function(req, res, next) {
 });
 
 router.get('/', (req,res) => {
-    res.json({message: "connected"});
+    res.json({message: "dddd"});
 });
 
 app.use('/api', router);
+app.use('/super', router);
 
 app.listen(PORT, () => {
     console.log('api running on POST: ' + PORT);
 });
+
+
