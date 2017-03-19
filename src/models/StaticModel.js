@@ -23,22 +23,23 @@ class StaticModel {
 
                         let dataset = [];
 
-                        for (let i = 0; i < info.length; i = i + 2) {
-                            if (info[i+1].includes('Faculty of')) {
-                                let fac = (info[i + 1]).replace('Faculty of', '').trim();
+                        for (let i = 0; i < info.length; i = i + 3) {
+                            if (info[i+2].includes('Faculty of')) {
+                                let fac = (info[i + 2]).replace('Faculty of', '').trim();
 
                                 if (fac == 'Comm and Bus Admin') {
                                     fac = 'Commerce and Business Administration'
                                 }
 
-                                let cour = info[i];
+                                let cour = info[i+1];
                                 if (cour.includes('Business Administration')) {
-                                    cour = (info[i]).replace('Business Administration:', '').trim();
+                                    cour = (info[i+1]).replace('Business Administration:', '').trim();
                                 }
 
                                 let obj = {
                                     course: cour,
-                                    faculty: fac
+                                    faculty: fac,
+                                    sName: info[i]
                                 };
 
                                 dataset.push(obj);
@@ -53,7 +54,7 @@ class StaticModel {
                                 groups[item.faculty] = [];
                             }
 
-                            groups[item.faculty].push(item.course);
+                            groups[item.faculty].push({course: item.course, sName: item.sName});
                         }
 
                         resolve(groups);
@@ -85,7 +86,7 @@ class StaticModel {
 
     getInfo(node, array) {
         if (typeof node.value !== "undefined") {
-            if (node.value.trim() != ""  && node.value.trim().length > 4) {
+            if (node.value.trim() != "") {
                 array.push(node.value.trim());
             }
         }

@@ -116,7 +116,7 @@ router.post('/major', (req, res) => {
         let majorlist = [];
         keys.forEach(function (key){
             data[key].forEach(function (one){
-                majorlist.push(one);
+                majorlist.push(one.course);
             });
         });
         console.log(majorlist);
@@ -163,12 +163,14 @@ router.post('/major', (req, res) => {
 router.post('/course', (req, res) => {
     let courseController = new CourseController();
 
-    courseController.httpGetAsync('http://www.calendar.ubc.ca/vancouver/index.cfm?tree=12,215,410,417', function (data) {
-        let document = parse5.parse(data);
-        let hreflist = [];
-        courseController.searchRecursively(document, "href", hreflist);
-        console.log(hreflist);
-        res.send(hreflist);
+    staticModel.getAllFaculties().then((data) => {
+
+    });
+
+
+
+    courseController.httpGetAsync('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=CPSC', function (data) {
+        res.send(data);
         // let processList = [];
         //
         // for (let i = 0; i < hreflist.length; i++) {
