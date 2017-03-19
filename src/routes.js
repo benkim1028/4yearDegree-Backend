@@ -77,4 +77,13 @@ router.post('/department', (req,res) => {
     });
 });
 
+const StaticModel = require('./models/StaticModel');
+let staticModel = new StaticModel();
+
+router.post('/static', (req, res) => {
+     staticModel.getAllFaculties().then((data) => {
+         res.send(data);
+     });
+});
+
 module.exports = router;
