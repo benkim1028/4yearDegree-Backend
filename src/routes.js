@@ -114,12 +114,11 @@ router.post('/major', (req, res) => {
     staticModel.getAllFaculties().then((data) => {
         let keys = Object.keys(data);// "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
         let majorlist = [];
-        keys.forEach(function (key){
-            data[key].forEach(function (one){
+        keys.forEach(function (key) {
+            data[key].forEach(function (one) {
                 majorlist.push(one.course);
             });
         });
-        console.log(majorlist);
         processList3.push(
             DepartmentSchema.find({}).then(function (departments) {
 
@@ -155,44 +154,58 @@ router.post('/major', (req, res) => {
                 Promise.all(processList2).then(() => {
                     res.send('success');
                 });
-            })
-        })
+            });
+        });
     });
 });
 
 router.post('/course', (req, res) => {
     let courseController = new CourseController();
+    let processList = [];
+    let processList2 = [];
+    let processList3 = [];
 
     staticModel.getAllFaculties().then((data) => {
-
-    });
-
-
-
-    courseController.httpGetAsync('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=CPSC', function (data) {
-        res.send(data);
-        // let processList = [];
-        //
-        // for (let i = 0; i < hreflist.length; i++) {
-        //     let courseSchema = new CourseSchema();
-        //
-        //     courseSchema.name = hreflist[i].name;
-        //     courseSchema.code = hreflist[i].code;
-        //
-        //     processList.push(
-        //         courseSchema.save().then((data) => {
-        //             console.log("successfully saved course with data name: " + data.name);
-        //         })
-        //     );
-        // }
-        //
-        // Promise.all(processList).then(() => {
-        //     res.send('success');
-        // });
-
+        let keys = Object.keys(data);// "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
+        let snamelist = [];
+        keys.forEach(function (key) {
+            data[key].forEach(function (one) {
+                snamelist.push(one.sName);
+            });
+        });
+        snamelist.forEach(function (eachsName) {
+            let URLofDept = 'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=' + eachsName;
+            processList.push(
+                courseController.httpGetAsync(URLofDept, function (data) {
+                    for (let eachdata of data) {
+                        let URLofCourse = "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=3&dept=" + eachdata.dept + "&course=" + eachdata.number;
+                        processList2.push(
+                            courseController.httpGetAsync2(URLofCourse, function (coursedata) {
+                                console.log(URLofCourse);
+                                let courseSchema = new CourseSchema();
+                                courseSchema.name = eachdata.fullname;
+                                courseSchema.code = eachdata.section;
+                                processList3.push(
+                                    // courseSchema.save().then((data) => {
+                                    //     console.log("successfully saved course with data name: " + data.name);
+                                    // })
+                                )
+                            })
+                        )
+                    }
+                })
+            );
+        });
+        Promise.all(processList).then(() => {
+            Promise.all(processList2).then(() => {
+                Promise.all(processList3).then(() => {
+                    console.log("yay")
+                    res.send('success');
+                });
+            });
+        });
     });
 });
-
 const StaticModel = require('./models/StaticModel');
 let staticModel = new StaticModel();
 
