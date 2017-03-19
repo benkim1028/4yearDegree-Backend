@@ -12,6 +12,22 @@ const CourseController = require('./controllers/CourseController');
 const parse5 = require('parse5');
 const async = require('async');
 
+
+router.delete('/all', (req,res) => {
+    let processList = [];
+    processList.push(
+        FacultySchema.remove({}),
+        DepartmentSchema.remove({}),
+        MajorSchema.remove({}),
+        CourseSchema.remove({})
+    );
+
+    Promise.all(processList).then(function() {
+        res.send("successfully deleted everything");
+    });
+
+});
+
 router.get('/faculty', (req, res) => {
     FacultySchema.find({}, (err, data) => {
         if (err) {
