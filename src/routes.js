@@ -21,6 +21,15 @@ router.get('/faculty', (req, res) => {
         }
     });
 });
+router.get('/course', (req, res) => {
+    CourseSchema.find({}, (err, data) => {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
+    });
+});
 router.get('/:facultyID', (req, res) => {
     console.log(req.params);
     DepartmentSchema.find({faculty: decodeURI(req.params.facultyID)}, (err, data) => {
@@ -181,14 +190,15 @@ router.post('/course', (req, res) => {
                         let URLofCourse = "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=3&dept=" + eachdata.dept + "&course=" + eachdata.number;
                         processList2.push(
                             courseController.httpGetAsync2(URLofCourse, function (coursedata) {
-                                console.log(URLofCourse);
+                                console.log(coursedata);
                                 let courseSchema = new CourseSchema();
                                 courseSchema.name = eachdata.fullname;
                                 courseSchema.code = eachdata.section;
+                                courseSchema.credit = Number(coursedata[0]);
                                 processList3.push(
-                                    // courseSchema.save().then((data) => {
-                                    //     console.log("successfully saved course with data name: " + data.name);
-                                    // })
+                                    courseSchema.save().then((data) => {
+                                        console.log("successfully saved course with data name: " + data.name);
+                                    })
                                 )
                             })
                         )
