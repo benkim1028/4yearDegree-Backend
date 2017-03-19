@@ -50,6 +50,16 @@ router.get('/:facultyID/:departmentID', (req, res) => {
         }
     });
 });
+router.get('/:facultyID/:departmentID/:majorID', (req, res) => {
+    console.log(req.params);
+    CourseSchema.find({}, (err, data) => {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
+    });
+});
 
 router.post('/faculty', (req, res) => {
     let facultyController = new FacultyController();
