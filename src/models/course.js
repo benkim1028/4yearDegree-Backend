@@ -6,7 +6,7 @@ const CourseSchema = new Schema({
     code: {required: true, type: String},
     major: {type:String},
     credit: {type:Number},
-    prereq: [{type: String, ref: 'Course'}]
+    prereq: {type: String}
 });
 
 module.exports = mongoose.model('Course', CourseSchema);
