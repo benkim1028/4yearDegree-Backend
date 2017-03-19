@@ -3,10 +3,11 @@
  */
 let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
+
 class DepartmentController {
 
     constructor() {
-        this.counter = 0;
+        this.counter = false;
     }
 
     httpGetAsync(theUrl, callback) { //theURL or a path to file

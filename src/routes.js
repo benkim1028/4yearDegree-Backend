@@ -3,8 +3,10 @@ const router = express.Router();
 
 const FacultySchema = require('./models/faculty');
 const DepartmentSchema = require('./models/department');
+const MajorSchema = require('./models/major');
 const FacultyController = require('./controllers/facultyController');
 const DepartmentController = require('./controllers/DepartmentController');
+const MajorController = require('./controllers/MajorController');
 const parse5 = require('parse5');
 
 router.get('/faculty', (req, res) => {
@@ -72,6 +74,7 @@ router.post('/department', (req, res) => {
 
                         departmentSchema.name = hreflist[i].name;
                         departmentSchema.href = hreflist[i].link;
+                        departmentSchema.faculty = faculty.name;
 
                         processList2.push(
                             departmentSchema.save().then((data) => {
@@ -90,13 +93,50 @@ router.post('/department', (req, res) => {
     })
 });
 
+router.post('/major', (req, res) => {
+    let processList = [];
+    let processList2 = [];
+    staticModel.getAllFaculties().then((data) => {
+        let keys = Object.keys(data); // "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
+        DepartmentSchema.find({}).then(function (departments) {
+            processList.push(
+                departments.forEach(function (department) {
+                    let majorController = new MajorController();
+                    majorController.httpGetAsync(department.href, function (data) {
+                        let document = parse5.parse(data);
+                        let hreflist = [];
+                        majorController.searchRecursively(document, "href", hreflist);
+                        for (let i = 0; i < hreflist.length; i++) {
+                            let majorSchema = new MajorSchema();
+
+                            majorSchema.name = hreflist[i].name;
+                            majorSchema.href = hreflist[i].link;
+
+                            processList2.push(
+                                majorSchema.save().then((data) => {
+                                    console.log("successfully saved major with data name: " + data.name);
+                                })
+                            );
+                        }
+
+                    });
+                })
+            )
+        })
+        Promise.all(processList).then((data) => {
+            console.log(data);
+            res.send('success');
+        })
+    })
+});
+
 const StaticModel = require('./models/StaticModel');
 let staticModel = new StaticModel();
 
 router.post('/static', (req, res) => {
-     staticModel.getAllFaculties().then((data) => {
-         res.send(data);
-     });
+    staticModel.getAllFaculties().then((data) => {
+        res.send(data);
+    });
 });
 
 module.exports = router;

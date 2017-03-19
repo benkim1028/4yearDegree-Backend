@@ -1,9 +1,12 @@
+/**
+ * Created by ENVY on 2017-03-19.
+ */
 let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-class FacultyController {
+class MajorController {
 
 
-    
+
     constructor() {
         this.counter = false;
     }
@@ -41,7 +44,7 @@ class FacultyController {
                     newobject["name"] = name;
                     newobject["link"] = link;
 
-                    if (this.counter && newobject.name != "Courses of Study and Degrees" && newobject.name != "UBC Vantage College")
+                    if (this.counter)
                         list.push(newobject);
                 }
             }
@@ -56,4 +59,4 @@ class FacultyController {
     }
 }
 
-module.exports = FacultyController;
+module.exports = MajorController;
