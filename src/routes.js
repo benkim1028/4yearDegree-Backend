@@ -52,7 +52,7 @@ router.get('/:facultyID/:departmentID', (req, res) => {
 });
 router.get('/:facultyID/:departmentID/:majorID', (req, res) => {
     console.log(req.params);
-    CourseSchema.find({major: decodeURI(req.params.majorID)}, (err, data) => {
+    CourseSchema.find({major: decodeURI(req.params.majorID)}).sort('code').exec((err, data) => {
         if (err) {
             res.send(err);
         } else {
