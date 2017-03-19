@@ -19,8 +19,9 @@ router.get('/faculty', (req, res) => {
         }
     });
 });
-router.get('/department', (req, res) => {
-    DepartmentSchema.find({}, (err, data) => {
+router.get('/:facultyID', (req, res) => {
+    console.log(req.params);
+    DepartmentSchema.find({faculty: decodeURI(req.params.facultyID)}, (err, data) => {
         if (err) {
             res.send(err);
         } else {
