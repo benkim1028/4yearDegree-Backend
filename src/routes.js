@@ -8,6 +8,7 @@ const FacultyController = require('./controllers/facultyController');
 const DepartmentController = require('./controllers/DepartmentController');
 const MajorController = require('./controllers/MajorController');
 const parse5 = require('parse5');
+const async = require('async');
 
 router.get('/faculty', (req, res) => {
     FacultySchema.find({}, (err, data) => {
@@ -59,12 +60,12 @@ router.post('/faculty', (req, res) => {
 });
 
 router.post('/department', (req, res) => {
-    let processList = [];
-    let processList2 = [];
     FacultySchema.find({}).then(function (faculties) {
-        processList.push(
-            faculties.forEach(function (faculty) {
-                let departmentController = new DepartmentController();
+        let processList = [];
+        let processList2 = [];
+        let departmentController = new DepartmentController();
+        faculties.forEach(function (faculty) {
+            processList.push(
                 departmentController.httpGetAsync(faculty.href, function (data) {
                     let document = parse5.parse(data);
                     let hreflist = [];
@@ -80,15 +81,15 @@ router.post('/department', (req, res) => {
                             departmentSchema.save().then((data) => {
                                 console.log("successfully saved department with data name: " + data.name);
                             })
-                        );
+                        )
                     }
-
-                });
+                })
+            )
+        });
+        Promise.all(processList).then(() => {
+            Promise.all(processList2).then(() => {
+                res.send('success');
             })
-        )
-        Promise.all(processList).then((data) => {
-            console.log(data);
-            res.send('success');
         })
     })
 });
@@ -98,6 +99,12 @@ router.post('/major', (req, res) => {
     let processList2 = [];
     staticModel.getAllFaculties().then((data) => {
         let keys = Object.keys(data); // "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
+        let majorlist = [];
+        for (let k = 0; k < data.length; k ++){
+            for(let x = 0; x < data[keys[k]].length; x++){
+                majorlist.push(data[keys[k]][x])
+            }
+        }
         DepartmentSchema.find({}).then(function (departments) {
             processList.push(
                 departments.forEach(function (department) {
@@ -111,6 +118,7 @@ router.post('/major', (req, res) => {
 
                             majorSchema.name = hreflist[i].name;
                             majorSchema.href = hreflist[i].link;
+                            majorSchema.department = department.name;
 
                             processList2.push(
                                 majorSchema.save().then((data) => {
@@ -125,7 +133,9 @@ router.post('/major', (req, res) => {
         })
         Promise.all(processList).then((data) => {
             console.log(data);
-            res.send('success');
+            Promise.all(processList2).then(() => {
+                res.send('success');
+            });
         })
     })
 });
