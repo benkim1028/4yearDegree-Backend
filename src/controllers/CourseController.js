@@ -7,7 +7,6 @@ let parse5 = require('parse5');
 class CourseController {
 
 
-
     constructor() {
         this.counter = false;
     }
@@ -15,7 +14,7 @@ class CourseController {
     httpGetAsync(theUrl, callback) { //theURL or a path to file
         let httpRequest = new XMLHttpRequest();
         let that = this;
-        httpRequest.onreadystatechange = function() {
+        httpRequest.onreadystatechange = function () {
             if (httpRequest.readyState == 4 && httpRequest.status == 200) {
                 let data = parse5.parse(httpRequest.responseText);
                 let array = [];
@@ -30,18 +29,17 @@ class CourseController {
 
                 let dataset = [];
 
-                for (let i=0; i < info.length; i++) {
+                for (let i = 0; i < info.length; i++) {
                     let obj = {};
 
                     obj.section = info[i];
-                    obj.fullname = info[i+1];
+                    obj.fullname = info[i + 1];
                     obj.dept = info[i].split(" ")[0];
                     obj.number = info[i].split(" ")[1];
 
                     dataset.push(obj);
                     i++;
                 }
-
 
 
                 callback(dataset);
@@ -52,17 +50,17 @@ class CourseController {
         httpRequest.open('GET', theUrl, true);
         httpRequest.send(null);
     }
+
     httpGetAsync2(theUrl, callback) { //theURL or a path to file
         let httpRequest = new XMLHttpRequest();
         let that = this;
-        httpRequest.onreadystatechange = function() {
+        httpRequest.onreadystatechange = function () {
             if (httpRequest.readyState == 4 && httpRequest.status == 200) {
                 let data = parse5.parse(httpRequest.responseText);
                 let array = [];
 
                 that.searchRecursively2(data, array);
 
-                console.log(array);
                 callback(array);
 
             }
@@ -87,35 +85,56 @@ class CourseController {
         }
     }
 
-    searchRecursively(node, name, value1, value2, list){
+    searchRecursively(node, name, value1, value2, list) {
         if (typeof node.attrs !== "undefined") {
             for (let attribute of node.attrs) {
-                if(attribute.name == name && (attribute.value == value1 || attribute.value == value2)){
+                if (attribute.name == name && (attribute.value == value1 || attribute.value == value2)) {
                     list.push(node);
                 }
             }
         }
 
         if (typeof node.childNodes !== "undefined") {
-            for(let child of node.childNodes) {
+            for (let child of node.childNodes) {
                 this.searchRecursively(child, name, value1, value2, list);
             }
         }
     }
-    searchRecursively2(node, list){
+
+    searchRecursively2(node, list) {
         if (typeof node.value !== "undefined") {
-            if(node.value.trim() !== ""){
-                if(node.value.trim().includes("Credits:")){
+            if (node.value.trim() !== "") {
+                if (node.value.trim().includes("Credits:")) {
                     list.push(node.value.trim().replace('Credits:', "").trim());
                 }
-                // if(node.value.trim().includes("Pre-reqs:")){
-                //     list.push(node.value.trim())
-                // }
+                if (node.value.trim().includes("Pre-reqs:")) {
+                    let append = "";
+                    let initializer = false;
+                    (node.parentNode.childNodes).forEach(function (child) {
+                        if (typeof child !== "undefined") {
+                            if (typeof child.childNodes !== "undefined") {
+                                if (typeof child.childNodes[0] !== "undefined") {
+                                    if (typeof child.childNodes[0].value !== "undefined") {
+                                        if (!initializer) {
+                                            append = child.childNodes[0].value;
+                                            initializer = true;
+                                        } else{
+                                            append = append + "," + child.childNodes[0].value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    list.push(node.value.trim() + append);
+                    console.log(node.value.trim() + append);
+                }
+
             }
         }
 
         if (typeof node.childNodes !== "undefined") {
-            for(let child of node.childNodes) {
+            for (let child of node.childNodes) {
                 this.searchRecursively2(child, list);
             }
         }
