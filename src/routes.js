@@ -202,6 +202,7 @@ router.post('/course', (req, res) => {
                         let URLofCourse = "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=3&dept=" + eachdata.dept + "&course=" + eachdata.number;
                         processList2.push(
                             courseController.httpGetAsync2(URLofCourse, function (coursedata) {
+                                console.log("successfully fetched data: " + eachdata.fullname);
                                 let courseSchema = new CourseSchema();
                                 courseSchema.name = eachdata.fullname;
                                 courseSchema.code = eachdata.section;
@@ -225,7 +226,6 @@ router.post('/course', (req, res) => {
         Promise.all(processList).then(() => {
             Promise.all(processList2).then(() => {
                 Promise.all(processList3).then(() => {
-                    console.log("yay")
                     res.send('success');
                 });
             });

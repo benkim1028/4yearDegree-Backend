@@ -127,7 +127,6 @@ class CourseController {
                         }
                     });
                     list.push(node.value.trim() + append);
-                    console.log(node.value.trim() + append);
                 }
 
             }
