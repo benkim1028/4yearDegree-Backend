@@ -3,15 +3,17 @@
  */
 let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-class DepartmentController {
+class CourseController {
+
+
 
     constructor() {
-        this.counter = 0;
+        this.counter = false;
     }
 
     httpGetAsync(theUrl, callback) { //theURL or a path to file
         let httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function () {
+        httpRequest.onreadystatechange = function() {
             if (httpRequest.readyState == 4 && httpRequest.status == 200) {
                 let data = httpRequest.responseText;  //if you fetch a file you can JSON.parse(httpRequest.responseText)
                 if (callback) {
@@ -24,21 +26,14 @@ class DepartmentController {
         httpRequest.send(null);
     }
 
-    httpGet(theUrl) {
-        let xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", theUrl, false); // false for synchronous request
-        xmlHttp.send(null);
-        return xmlHttp.responseText;
-    }
-
-    searchRecursively(node, name, list) {
+    searchRecursively(node, name, list){
         let newRegex = new RegExp("^index.cfm\\?tree=[0-9]\\S*");
         let newRegex2 = new RegExp("[a-z]+(\\s|[a-z])*")
         let counter
         if (typeof node.attrs !== "undefined") {
             for (let attribute of node.attrs) {
 
-                if (attribute.name == "cellpadding" && attribute.value == 1) {
+                if(attribute.name == "cellpadding" && attribute.value == 1){
                     this.counter = true;
                 }
                 if (attribute.name == name && newRegex.test(attribute.value) && newRegex2.test(node.childNodes[0].value)) {
@@ -47,9 +42,8 @@ class DepartmentController {
                     let newobject = {};
                     newobject["name"] = name;
                     newobject["link"] = link;
-                    let isBachelor = new RegExp('^(Bachelor|B\\.)(\\s|\\S)*')
 
-                    if (this.counter && isBachelor.test(newobject.name))
+                    if (this.counter && newobject.name != "Courses of Study and Degrees" && newobject.name != "UBC Vantage College")
                         list.push(newobject);
                 }
             }
@@ -57,11 +51,11 @@ class DepartmentController {
 
         if (typeof node.childNodes !== "undefined") {
             let that = this;
-            for (let child of node.childNodes) {
+            for(let child of node.childNodes) {
                 this.searchRecursively(child, name, list);
             }
         }
     }
 }
 
-module.exports = DepartmentController;
+module.exports = CourseController;
