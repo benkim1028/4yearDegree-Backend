@@ -22,7 +22,7 @@ router.post('/faculty', (req,res) => {
         let document = parse5.parse(data);
         let hreflist = [];
         facultyController.searchRecursively(document, "href", hreflist);
-
+        // res.send(hreflist);
         let processList = [];
 
         for (let i=0; i < hreflist.length; i++) {

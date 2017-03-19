@@ -1,11 +1,14 @@
+/**
+ * Created by ENVY on 2017-03-18.
+ */
+const FacultySchema = require('./models/faculty');
 let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 class FacultyController {
 
-
-    
     constructor() {
-        this.counter = false;
+        this.counter = 0;
+        this.data = FacultySchema.find();
     }
 
     httpGetAsync(theUrl, callback) { //theURL or a path to file
@@ -26,22 +29,17 @@ class FacultyController {
     searchRecursively(node, name, list){
         let newRegex = new RegExp("^index.cfm\\?tree=[0-9]\\S*");
         let newRegex2 = new RegExp("[a-z]+(\\s|[a-z])*")
-        let counter
         if (typeof node.attrs !== "undefined") {
             for (let attribute of node.attrs) {
-
-                if(attribute.name == "cellpadding" && attribute.value == 1){
-                    this.counter = true;
-                }
                 if (attribute.name == name && newRegex.test(attribute.value) && newRegex2.test(node.childNodes[0].value)) {
                     let name = node.childNodes[0].value;
                     let link = "http://www.calendar.ubc.ca/vancouver/" + attribute.value;
                     let newobject = {};
                     newobject["name"] = name;
                     newobject["link"] = link;
-
-                    if (this.counter && newobject.name != "Courses of Study and Degrees" && newobject.name != "UBC Vantage College")
+                    if (this.counter >= 10)
                         list.push(newobject);
+                    this.counter++;
                 }
             }
         }
