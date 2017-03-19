@@ -29,7 +29,7 @@ router.get('/:facultyID', (req, res) => {
         }
     });
 });
-router.get('/:facultyID/:majorID', (req, res) => {
+router.get('/:departmentID', (req, res) => {
     console.log(req.params);
     MajorSchema.find({department: decodeURI(req.params.majorID)}, (err, data) => {
         if (err) {
