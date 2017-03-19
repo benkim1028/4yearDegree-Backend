@@ -31,8 +31,9 @@ router.get('/:facultyID', (req, res) => {
         }
     });
 });
-router.get('/major', (req, res) => {
-    MajorSchema.find({}, (err, data) => {
+router.get('/:facultyID/:departmentID', (req, res) => {
+    console.log(req.params);
+    MajorSchema.find({department: decodeURI(req.params.departmentID)}, (err, data) => {
         if (err) {
             res.send(err);
         } else {
