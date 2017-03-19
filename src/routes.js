@@ -21,7 +21,7 @@ router.get('/faculty', (req, res) => {
 });
 router.get('/:facultyID', (req, res) => {
     console.log(req.params);
-    DepartmentSchema.find({faculty: req.params.facultyID}, (err, data) => {
+    DepartmentSchema.find({faculty: decodeURI(req.params.facultyID)}, (err, data) => {
         if (err) {
             res.send(err);
         } else {
