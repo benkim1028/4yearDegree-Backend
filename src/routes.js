@@ -52,7 +52,7 @@ router.get('/:facultyID/:departmentID', (req, res) => {
 });
 router.get('/:facultyID/:departmentID/:majorID', (req, res) => {
     console.log(req.params);
-    CourseSchema.find({}, (err, data) => {
+    CourseSchema.find({major: decodeURI(req.params.majorID)}).sort('code').exec((err, data) => {
         if (err) {
             res.send(err);
         } else {
@@ -187,9 +187,11 @@ router.post('/course', (req, res) => {
     staticModel.getAllFaculties().then((data) => {
         let keys = Object.keys(data);// "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
         let snamelist = [];
+        let majorList = [];
         keys.forEach(function (key) {
             data[key].forEach(function (one) {
                 snamelist.push(one.sName);
+                majorList.push(one.course);
             });
         });
         snamelist.forEach(function (eachsName) {
@@ -207,6 +209,8 @@ router.post('/course', (req, res) => {
                                 if (coursedata[1] !== "undefined") {
                                     courseSchema.prereq = coursedata[1];
                                 }
+                                let k = snamelist.indexOf(eachsName);
+                                courseSchema.major = majorList[k];
                                 processList3.push(
                                     courseSchema.save().then((data) => {
                                         console.log("successfully saved course with data name: " + data.name);
