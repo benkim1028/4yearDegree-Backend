@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const CourseSchema = new Schema({
     name: {required: true, type: String},
-    code: {typeNumber: Number},
+    code: {required: true, type: Number},
     major: {required: true, type:String},
     prereq: [{type: Schema.Types.ObjectId, ref: 'Course'}]
 });

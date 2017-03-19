@@ -28,6 +28,15 @@ router.get('/department', (req, res) => {
         }
     });
 });
+router.get('/major', (req, res) => {
+    MajorSchema.find({}, (err, data) => {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
+    });
+});
 
 router.post('/faculty', (req, res) => {
     let facultyController = new FacultyController();
@@ -97,48 +106,55 @@ router.post('/department', (req, res) => {
 router.post('/major', (req, res) => {
     let processList = [];
     let processList2 = [];
+    let processList3 = [];
     staticModel.getAllFaculties().then((data) => {
-        let keys = Object.keys(data); // "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
+        let keys = Object.keys(data);// "Land and Food Systems", "Arts", "Education", "Medicine", "Applied Science", "Science", "Commerce and Business Administration", "Forestry", "Dentistry", "Arts Commuter Transition Program"
         let majorlist = [];
-        for (let k = 0; k < data.length; k ++){
-            for(let x = 0; x < data[keys[k]].length; x++){
-                majorlist.push(data[keys[k]][x])
-            }
-        }
-        DepartmentSchema.find({}).then(function (departments) {
-            processList.push(
+        keys.forEach(function (key){
+            data[key].forEach(function (one){
+                majorlist.push(one);
+            });
+        });
+        console.log(majorlist);
+        processList3.push(
+            DepartmentSchema.find({}).then(function (departments) {
+
                 departments.forEach(function (department) {
                     let majorController = new MajorController();
-                    majorController.httpGetAsync(department.href, function (data) {
-                        let document = parse5.parse(data);
-                        let hreflist = [];
-                        majorController.searchRecursively(document, "href", hreflist);
-                        for (let i = 0; i < hreflist.length; i++) {
-                            let majorSchema = new MajorSchema();
+                    processList.push(
+                        majorController.httpGetAsync(department.href, function (data) {
+                            let document = parse5.parse(data);
+                            let hreflist = [];
+                            majorController.searchRecursively(document, "href", hreflist);
+                            for (let i = 0; i < hreflist.length; i++) {
+                                let majorSchema = new MajorSchema();
+                                if (majorlist.includes(hreflist[i].name)) {
+                                    majorSchema.name = hreflist[i].name;
+                                    majorSchema.href = hreflist[i].link;
+                                    majorSchema.department = department.name;
+                                    processList2.push(
+                                        majorSchema.save().then((data) => {
+                                            console.log("successfully saved major with data name: " + data.name);
+                                        })
+                                    );
+                                }
+                            }
 
-                            majorSchema.name = hreflist[i].name;
-                            majorSchema.href = hreflist[i].link;
-                            majorSchema.department = department.name;
-
-                            processList2.push(
-                                majorSchema.save().then((data) => {
-                                    console.log("successfully saved major with data name: " + data.name);
-                                })
-                            );
-                        }
-
-                    });
+                        })
+                    )
                 })
-            )
+
+            })
+        )
+        Promise.all(processList3).then(() => {
+            Promise.all(processList).then(() => {
+                Promise.all(processList2).then(() => {
+                    res.send('success');
+                });
+            })
         })
-        Promise.all(processList).then((data) => {
-            console.log(data);
-            Promise.all(processList2).then(() => {
-                res.send('success');
-            });
-        })
-    })
-});
+    });
+})
 
 const StaticModel = require('./models/StaticModel');
 let staticModel = new StaticModel();
