@@ -42,7 +42,7 @@ const router = require('./src/routes');
 app.use('/api', router);
 
 app.listen(PORT, () => {
-    console.log('api running on POST: ' + PORT);
+    console.log('api running on PORT: ' + PORT);
 });
 
 
