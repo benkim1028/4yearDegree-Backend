@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const FacultySchema = require('./models/faculty');
+const DepartmentSchema = require('./models/department');
 const FacultyController = require('./controllers/facultyController');
+const DepartmentController = require('./controllers/DepartmentController');
 const parse5 = require('parse5');
 
 router.get('/faculty', (req,res) => {
@@ -41,6 +43,36 @@ router.post('/faculty', (req,res) => {
         Promise.all(processList).then(() => {
              res.send('success');
         });
+
+    });
+});
+
+router.post('/department', (req,res) => {
+    let departmentController = new DepartmentController();
+
+    departmentController.httpGetAsync('http://www.calendar.ubc.ca/vancouver/index.cfm?tree=12,195,0,0', function(data) {
+        let document = parse5.parse(data);
+        let hreflist = [];
+        departmentController.searchRecursively(document, "href", hreflist);
+        res.send(hreflist);
+        // let processList = [];
+        //
+        // for (let i=0; i < hreflist.length; i++) {
+        //     let departmentSchema = new DepartmentSchema();
+        //
+        //     departmentSchema.name = hreflist[i].name;
+        //     departmentSchema.href = hreflist[i].link;
+        //
+        //     processList.push(
+        //         DepartmentSchema.save().then((data) => {
+        //             console.log("successfully saved Department with data name: " + data.name);
+        //         })
+        //     );
+        // }
+        //
+        // Promise.all(processList).then(() => {
+        //     res.send('success');
+        // });
 
     });
 });
